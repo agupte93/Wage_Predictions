@@ -1,5 +1,6 @@
-Relevant : ENG,INTP,COW,AGEP,FER,JWTR*,OIP,PAP,RETP,SCHL,SEMP
+Relevant : ENG,INTP,COW,AGEP,FER,JWTR*,OIP,PAP,RETP,SCHL,SEMP,WKHP,FOD1P,FOD2P,PERNP,PINCP
 
+Response Variable : WAGP (Wages in Past 12 months) "Annual Income"
 
 
 Remove All Years of Naturalization (CTIWP) IF CitizenShip indicator (CIT) <> 4
