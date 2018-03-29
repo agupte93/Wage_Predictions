@@ -1,2 +1,8 @@
+Relevant : ENG,INTP,COW,AGEP,FER,JWTR*,OIP,PAP,RETP,SCHL,SEMP
+
+
+
 Remove All Years of Naturalization (CTIWP) IF CitizenShip indicator (CIT) <> 4
 DDRS (Self - Care Difficultly)  Remove Rows that have DDRS Blank.
+HINS(1-7) related Health Care
+ADJINC :  AdjustMent Indicator to Use as multiplier
