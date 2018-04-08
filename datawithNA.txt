@@ -1,0 +1,24 @@
+ SERIALNO   SPORDER      PUMA    ADJINC     PWGTP      AGEP       CIT     CITWP       COW      DDRS      DEAR 
+        0         0         0         0         0         0         0    310514    150247     18436         0 
+     DEYE      DOUT      DPHY      DRAT     DRATX      DREM       ENG       FER       GCL       GCM       GCR 
+        0     61283     18436    360782    342703     18436    218117    278266    132615    362227    354031 
+    HINS1     HINS2     HINS3     HINS4     HINS5     HINS6     HINS7      INTP     JWMNP     JWRIP      JWTR 
+        0         0         0         0         0         0         0     61283    208302    225276    198329 
+     LANP      LANX       MAR     MARHD     MARHM     MARHT     MARHW    MARHYP       MIG       MIL      MLPA 
+   218117     18436         0    162394    162394    162394    162394    162394      3470     70645    345228 
+     MLPB     MLPCD      MLPE     MLPFG      MLPH      MLPI      MLPJ      MLPK      NWAB      NWAV      NWLA 
+   345228    345228    345228    345228    345228    345228    345228    345228     65848     65848     65848 
+     NWLK      NWRE       OIP       PAP      RELP      RETP       SCH      SCHG      SCHL      SEMP       SEX 
+    65848     65848     61283     61283         0     61283     10801    269130     10801     61283         0 
+     SSIP       SSP      WAGP      WKHP       WKL       WKW       WRK      YOEP       ANC     ANC1P     ANC2P 
+    61283     61283     61283    176537     65848    176537     98951    261013         0         0         0 
+   DECADE       DIS   DRIVESP       ESP       ESR   FHICOVP     FOD1P     FOD2P     HICOV      HISP      INDP 
+   261013         0    225276    289765     65848         0    270434    355205         0         0    150247 
+     JWAP      JWDP   MIGPUMA     MIGSP       MSP    NAICSP  NATIVITY       NOP        OC      OCCP      PAOC 
+   208302    208302    317410    317410     61283         0         0    289765         0    150247    215612 
+    PERNP     PINCP      POBP    POVPIP   POWPUMA     POWSP   PRIVCOV    PUBCOV    QTRBIR     RAC1P     RAC2P 
+    65848     61283         0     11935    198329    198329         0         0         0         0         0 
+    RAC3P   RACAIAN    RACASN    RACBLK     RACNH    RACNUM     RACPI    RACSOR    RACWHT        RC   SCIENGP 
+        0         0         0         0         0         0         0         0         0         0    270434 
+SCIENGRLP       SFN       SFR      SOCP       VPS      WAOB 
+   270434    347023    347023         0    345228         0 
