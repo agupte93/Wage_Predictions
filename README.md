@@ -1,8 +1,8 @@
-#Predicting Annual Wages of Individuals Based on Public Use Microdata Samples
+# Predicting Annual Wages of Individuals Based on Public Use Microdata Samples
 
 ![](./myMediaFolder/media/image1.png =150x150)
 
-Table of Contents
+Table of Contents 
 
 [Part 1 Executive Summary 3](#_Toc450490166)
 
