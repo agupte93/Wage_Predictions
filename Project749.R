@@ -1,469 +1,540 @@
-######################## DISCOVERY PHASE##############################
+######################## WAGES PREDICTION DATA MODELS##############################
 
-######################### read data into R################
+######################### LOAD LIBRARIES ################
 getwd()
-#setwd("C:/Users/KP/Desktop/Fall 2017/MIS 620 Big Data/Final Project")
-
-#library(data.table)
-#library(dplyr)
-#library(ggplot2)
+library(rpart.plot)
 library(caret)
 library(mice)
+library(earth)
+library(ggplot2)
+library(gridExtra)
+library(ggthemes)
+library(dplyr)
+library(corrplot)
+library(mlbench)
+library(parallel)
+library(doParallel)
+library(VIM)
+library(purrr)
+library(tidyr)
+library(ggplot2)
 
+
+
+## LOAD DATA in R environment ##
 
 alldata <- read.csv(file = "2016Data_withSelectedColumns.csv")
 str(alldata)
+
 
 View(alldata)  # View the data set
 
 #check the column names of the data frame
 colnames(alldata)
 
+#Create Unique Identifier
 
-# #check for outliers in the 'odds' column for player 1 using boxplot
-# 
-# boxplot_Player1_odd<- boxplot(alldata_to_process$Player_1_odd, xlab = "", ylab= "player1 odds", main = "Outliers for Odds")
-# 
-# 
-# #check for outliers
-# 
-# outlier_Player1_odd <- data.frame() #initialising storage for outliers
-# 
-# if(length(boxplot_Player1_odd$out) > 0){
-#   for(n in 1:length(boxplot_Player1_odd$out)){
-#     pt <-data.frame(value=boxplot_Player1_odd$out[n],group=0) 
-#     outlier_Player1_odd<-rbind(outlier_Player1_odd,pt) 
-#   }
-# }
-# 
-# #check for outliers in the 'odds' column for player 2 using boxplot
-# 
-# boxplot_Player2_odd<- boxplot(alldata_to_process$Player_2_odd, xlab = "Player2 odds", ylab= "player2 odd")
-# 
-# 
-# #check for outliers
-# 
-# outlier_Player2_odd <- data.frame() #initialising storage for outliers
-# 
-# if(length(boxplot_Player2_odd$out) > 0){
-#   for(n in 1:length(boxplot_Player2_odd$out)){
-#     pt <-data.frame(value=boxplot_Player2_odd$out[n],group=0) 
-#     outlier_Player2_odd<-rbind(outlier_Player2_odd,pt) 
-#   }
-# }
+newID <-
+  paste(alldata$SERIALNO, "_", alldata$SPORDER, "_", alldata$PUMA)
 
-################# DATA PREPARATION##################
+#remove 1st 3 fields from alldata
 
-# #remove all Player 1 odd outlier rows from data frame
-# 
-# alldata_to_process_without_player1odd_outlier = alldata_to_process[!(alldata_to_process$Player_1_odd  %in% outlier_Player1_odd$value),]
-# 
-# #remove all NAs from player 1 odd and take only valid values for mean calculation
-# 
-# player1_odd_for_mean = na.omit(alldata_to_process_without_player1odd_outlier$Player_1_odd)
-# 
-# #calculate mean for player 1 odd
-# 
-# mean_player1_odd=mean(player1_odd_for_mean)
-# mean_player1_odd=round(mean_player1_odd,2)
-# 
-# #find outlier range for player 1 odd
-# minimum_player1_odd_outlier = min(outlier_Player1_odd$value)
-# 
-# #replace all outlier player 1 odd values with the mean value for player 1 odd
-# for(i in 1:nrow(alldata_to_process))
-# {
-#   if (alldata_to_process$Player_1_odd[i] > minimum_player1_odd_outlier && !is.na(alldata_to_process$Player_1_odd[i])) {
-#     alldata_to_process$Player_1_odd[i] = mean_player1_odd
-#   }
-# }
-# 
-# 
-# #remove all Player 2 odd outlier rows from data frame
-# 
-# alldata_to_process_without_player2odd_outlier = alldata_to_process[!(alldata_to_process$Player_2_odd  %in% outlier_Player2_odd$value),]
-# 
-# #remove all NAs from player 2 odd and take only valid values for mean calculation
-# 
-# player2_odd_for_mean = na.omit(alldata_to_process_without_player2odd_outlier$Player_2_odd)
-# 
-# #calculate mean for player 2 odd
-# 
-# mean_player2_odd=mean(player2_odd_for_mean)
-# mean_player2_odd=round(mean_player2_odd,2)
-# 
-# #find outlier range for player 2 odd
-# outlier_Player2_odd=subset(outlier_Player2_odd, outlier_Player2_odd$value > 0)
-# minimum_player2_odd_outlier = min(outlier_Player2_odd$value)
-# 
-# #replace all outlier player 2 odd values with the mean value for player 2 odd
-# for(i in 1:nrow(alldata_to_process))
-# {
-#   if (alldata_to_process$Player_2_odd[i] > minimum_player2_odd_outlier && !is.na(alldata_to_process$Player_2_odd[i])) {
-#     alldata_to_process$Player_2_odd[i] = mean_player2_odd
-#   }
-# }
+alldata = alldata[-c(1:3)]
 
-#check data rows with DDRS=NA (people with age<5)
+# add newID column
+alldata = cbind(newID, alldata)
 
-DDRSNA<- subset(alldata, is.na(alldata$DDRS))
+#remove rows where WAGP is 0
+alldata <- subset(alldata, alldata$WAGP != 0)
+
+#remove rows where INDP is NA< represents people with age 16 or below
+alldata <- subset(alldata, !is.na(alldata$INDP))
+
+#remove rows where DDRS is NA< represents people with age 5 or below
+alldata <- subset(alldata, !is.na(alldata$DDRS))
+
+
+#remove rows where AGEP > 10
+alldata <- subset(alldata, alldata$AGEP > 10)
+
+saveRDS(alldata, "alldata.rds")
+
+#separate out numerical and categorical variable
+
+alldata_numerical <- alldata[, c(2:4, 6, 28:29, 39, 56:57, 59, 67:68, 72)]
+alldata_numerical <- alldata_numerical[1:100000, ]
+saveRDS(alldata_numerical, "alldata_numerical.rds")
+
+alldata_categorical <- alldata[-c(2:4, 6, 28:29, 39, 56:57, 59, 67:68, 72)]
+
+#removing categorical variables based on data understanding
+alldata_categorical <-
+  alldata_categorical[-c(
+    5,
+    6,
+    7,
+    8,
+    10,
+    11,
+    14,
+    15,
+    16,
+    17:23,
+    24,
+    25,
+    27,
+    31,
+    32,
+    35:43,
+    46:48,
+    49,
+    53,
+    57:65,
+    68:72,
+    74,
+    75,
+    79:84,
+    87,
+    89,
+    91:93,
+    95,
+    96,
+    97,
+    98:112
+  )]
+str(alldata_categorical)
+
+alldata_categorical <- alldata_categorical[1:100000, ]
+saveRDS(alldata_categorical, "alldata_categorical.rds")
+
+
+#find categorical columns which have NA and need to be imputed
+x <- unlist(lapply(alldata_categorical, function(x)
+  any(is.na(x))))
+
+#find numerical columns which have NA and need to be imputed
+y <- unlist(lapply(alldata_numerical, function(x)
+  any(is.na(x))))
+#str(alldata_categorical)
 
 #imputing NA values using Mice package
 set.seed(2)
 md.pattern(alldata)
-write.csv(md.pattern(alldata), "test.csv")
 
+aggr_plot <-
+  aggr(
+    alldata,
+    col = c('navyblue', 'red'),
+    numbers = TRUE,
+    sortVars = TRUE,
+    labels = names(data),
+    cex.axis = .7,
+    gap = 3,
+    ylab = c("Histogram of missing data", "Pattern")
+  )
 
-# library(VIM)
-# aggr_plot <- aggr(data, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(data), cex.axis=.7, gap=3, ylab=c("Histogram of missing data","Pattern"))
+md.pattern(alldata_numerical)
+md.pattern(alldata_categorical)
 
-data_new=data.frame(alldata$CITWP, alldata$SERIALNO)
-micedData <- mice(data_new,m=2,maxit=2,meth='pmm')
-micedData<- complete(micedData,1)
+#this is how to use mice in parallel to save time------------ Parallelize MICE
+cores <- 4 #don't use more than 4 cores
+cl <-  makeForkCluster(cores)
+clusterSetRNGStream(cl, 489) #set seed for everymember of cluster
+registerDoParallel(cl)
 
-View(micedData)
-summary(sampledata)
-summary(micedData)
+#how many sets to impute
+msets = 2
 
+#using foreach to seperate mice runs and recombine results
+#for large datasets this can speed up imputation dramatically!
 
-write.csv(micedData, "MicedData.csv")
-
-###################  MODEL PLANNING  ##########################
-
-
-#let's split the data into training and tests sets
-#create training 
-
-library(caret)
-library(pROC)
-library(rpart)
-library(rpart.plot)
-library(ROCR)
-
-#lets use the credit dataset predicting defaulting on a loan
-alldata <- read.csv("MicedData.csv")
-
-alldata = alldata[,-1]
-alldata$player_1_score<-sample(1:50,nrow(alldata),rep=TRUE)
-alldata$player_2_score<-sample(2:60,nrow(alldata),rep=TRUE)
-
-alldata = alldata[1:30000,]
-y <- alldata$Player_1_Wins #keep your DV away from all processing and filtering to avoid overfitting!
-x <- alldata[,c(1,3,4,5,6,7,8,9,18,19,20,23,24)] #only first 16 columns (predictors)
-set.seed(200)
-#lets grab 70% of data for training and 30% for test sets
-#will sample proportional to base rate of the DV (we have imbalanced data more no then yes)
-inTrain<-createDataPartition(y=y, p=.70, list=FALSE)
-y.train <- y[inTrain]
-x.train <- x[inTrain,]
-y.test<- y[-inTrain]
-x.test <- x[-inTrain,]
-
-#check composition
-table(y.train)
-table(y.test)
-
-Train.data<-alldata[inTrain,]
-Test.data<-alldata[-inTrain,]
-#lets split out using index of training and test sets created above, uses row index
-
-#twoClassSummary is built in function with ROC, Sensitivity and Specificity
-ctrl <- trainControl(method="cv",classProbs=TRUE, summaryFunction = twoClassSummary, verboseIter = TRUE)
-
-
-################# MODEL BUILDING and RESULTS#################
-
-
-## Decision Trees
-
-modelLookup("rpart")
-
-str(Train.data)
-
-
-m.rpart <- train(Player_1_Wins ~   doubles  + player_1_score + player_2_score + retired_player + cancelled_game + walkover + Player_1_odd + Player_2_odd , 
-                 trControl = ctrl,
-                 metric = "Accuracy", #using AUC to find best performing parameters
-                 preProc = c("range", "nzv"), #scale from 0 to 1 and from columns with zero variance
-                 data = Train.data, 
-                 method = "rpart")
-
-m.rpart
-
-
-p.rpart <- predict(m.rpart,Test.data)
-p.rpart
-confusionMatrix(p.rpart,Test.data$Player_1_Wins) 
-
-
-pred <- prediction(as.numeric(p.rpart), Test.data$Player_1_Wins)
-perf <- performance(pred,"tpr","fpr")
-performance(pred,"auc")@y.values
-confusionMatrix(p.rpart, Test.data$Player_1_Wins)
-
-plot(perf, lwd=2, xlab="False Positive Rate (FPR)",
-     ylab="True Positive Rate (TPR)")
-abline(a=0, b=1, col="gray50", lty=3)
-
-
-## corresponding AUC score
-auc <- performance(pred, "auc")
-auc <- unlist(slot(auc, "y.values"))
-auc
+micedData_numerical <-
+  mice(alldata_numerical[1:100000, c(4, 6, 7, 13)],
+       m = 2,
+       maxit = 2,
+       meth = 'pmm')
+micedData_numerical <- complete(micedData_numerical, 1)
+saveRDS(micedData_numerical, "micedData_numerical.rds")
+View(micedData_numerical)
+str(micedData_numerical)
 
 
 
-# Make a simple decision tree 
-fit <- rpart(Player_1_Wins ~ country + day + tournament_name + doubles + player_1_name + player_2_name + player_1_score + player_2_score + retired_player + cancelled_game + walkover + Player_1_odd + Player_2_odd, 
-             method="class", 
-             data=Train.data,
-             control=rpart.control(minsplit=1),  ###minsplit=1 means we want at least one split in the tree
-             parms=list(split='information'))
+micedData_categorical <-
+  mice(alldata_categorical[1:100000, c(5, 6)],
+       m = 2,
+       maxit = 2,
+       meth = 'rf')
+micedData_categorical_5and6 <- complete(micedData_categorical, 1)
+saveRDS(micedData_categorical_5and6,
+        "micedData_categorical_5and6.rds")
 
-summary(fit)
 
-#lets prune the tree to avoid overfitting using cross validation
+micedData_categorical_7_10_11_13 <-
+  mice(alldata_categorical[1:100000, c(7, 10, 11, 13)],
+       m = 2,
+       maxit = 2,
+       meth = 'rf')
+micedData_categorical_7_10_11_13 <-
+  complete(micedData_categorical_7_10_11_13, 1)
+saveRDS(micedData_categorical_7_10_11_13,
+        "micedData_categorical_7_10_11_13.rds")
 
-printcp(fit) #display crossvalidated error for each tree size
-plotcp(fit) #plot cv error
+micedData_categorical_17_22 <-
+  mice(alldata_categorical[1:100000, c(17, 22)],
+       m = 2,
+       maxit = 1,
+       meth = 'rf')
+micedData_categorical_17_22 <-
+  complete(micedData_categorical_17_22, 1)
+saveRDS(micedData_categorical_17_22,
+        "micedData_categorical_17_22.rds")
 
-#select CP with lowest crossvalidated error 
 
-#we can grab this from the plotcp table automatically with 
-opt.cp <- fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"]
+micedData_categorical_25 <-
+  mice(alldata_categorical[1:100000, c(8, 25, 30, 31)],
+       m = 2,
+       maxit = 2,
+       meth = 'sample')
+micedData_categorical_25 <- complete(micedData_categorical_25, 1)
+saveRDS(micedData_categorical_25,
+        "micedData_categorical_25_8_30_31.rds")
+
+alldata_categorical$MIGSP[is.na(alldata_categorical$MIGSP)] <- 0
+
+#completed categorical merged dataset with imputations
+complete_miced_categorical <-
+  cbind(
+    micedData_categorical_5and6,
+    micedData_categorical_7_10_11_13,
+    micedData_categorical_25_8_30_31,
+    micedData_categorical_17_22,
+    alldata_categorical$MIGSP
+  )
+complete_categorical <-
+  cbind(complete_miced_categorical, alldata_categorical[, c(1:4, 9, 12, 14, 15, 16, 18, 19, 20, 21, 23, 24, 27, 28, 29, 32)])
+saveRDS(complete_categorical, "complete_categorical.rds")
+
+
+complete_numerical <-
+  cbind(micedData_numerical, alldata_numerical[, c(1, 2, 3, 5, 8, 9, 10, 11, 12)])
+saveRDS(complete_numerical, "complete_numerical.rds")
+#remove near zero variance
+
+
+final_imputed_data <- cbind(complete_numerical, complete_categorical)
+saveRDS(final_imputed_data, "final_imputed.rds")
+
+NearZeroNumerical <-
+  nearZeroVar(complete_numerical,
+              allowParallel = TRUE,
+              saveMetrics = TRUE)
+str(NearZeroNumerical)
+micedData_numerical_withoutzeroVar <-
+  complete_numerical[-c(5, 8, 9, 10, 11)]
+colnames(micedData_numerical_withoutzeroVar)
+
+final_data <-
+  cbind(micedData_numerical_withoutzeroVar, complete_categorical)
+final_withoutNewID <- final_data[, -22]
+lenstr(final_withoutNewID)
+saveRDS(final_withoutNewID, "final_processed_data.rds")
+
+
+#### Remove Highly Correlated Variables ####
+# calculate correlation matrix
+correlationMatrix <- cor(final_withoutNewID)
+corrplot(correlationMatrix)
+# summarize the correlation matrix
+print(correlationMatrix)
+# find attributes that are highly corrected (ideally >0.75)
+highlyCorrelated <- findCorrelation(correlationMatrix, cutoff = 0.75)
+# print indexes of highly correlated attributes
+print(highlyCorrelated)
+
+#removing highly correlated variables
+final_withoutNewID <- final_withoutNewID[, -c(highlyCorrelated)]
+#Removing Income to Poverty Recode
+final_withoutNewID <- final_withoutNewID[, -c(17)]
+
+#Variable Importance Code Using Earth Package
+m.earth <-
+  earth(WAGP ~ ., data = final_withoutNewID) # finding important variables
+ev <- evimp(m.earth)
+plot(ev,
+     cex.legend = 1,
+     x.legend = nrow(x),
+     y.legend = x[1, "nsubsets"])
+plot(ev)
+impvar_data <- final_withoutNewID[, c(27, 7, 5, 31, 32, 28, 33, 21, 20, 34, 6)]
+colnames(impvar_data)
+
+#Subset Wages in Range of $20,000 to $200,000
+
+impvar_data <- subset(impvar_data, impvar_data$WAGP > 20000)
+impvar_data <- subset(impvar_data, impvar_data$WAGP < 200000)
+
+
+impvar_data %>%
+  keep(is.numeric) %>%
+  gather() %>%
+  ggplot(aes(value)) +
+  facet_wrap( ~ key, scales = "free") +
+  geom_histogram()
+
+
+# Plotting Boxplots to View Outliers in Important Variables
+
+boxplot_column1 <-
+  qplot(
+    x = impvar_data$WAGP,
+    y = impvar_data[, 1],
+    geom = "boxplot" ,
+    xlab = "",
+    ylab = "SCHL"
+  )
+boxplot_column2 <-
+  qplot(
+    x = impvar_data$WAGP,
+    y = impvar_data[, 2],
+    geom = "boxplot" ,
+    xlab = "",
+    ylab = "WKHP"
+  )
+boxplot_column3 <-
+  qplot(
+    x = impvar_data$WAGP,
+    y = impvar_data[, 3],
+    geom = "boxplot" ,
+    xlab = "",
+    ylab = "AGEP"
+  )
+boxplot_column4 <-
+  qplot(
+    x = impvar_data$WAGP,
+    y = impvar_data[, 4],
+    geom = "boxplot" ,
+    xlab = "",
+    ylab = "ESR"
+  )
+boxplot_column5 <-
+  qplot(
+    x = impvar_data$WAGP,
+    y = impvar_data[, 5],
+    geom = "boxplot" ,
+    xlab = "",
+    ylab = "INDP"
+  )
+boxplot_column6 <-
+  qplot(
+    x = impvar_data$WAGP,
+    y = impvar_data[, 6],
+    geom = "boxplot" ,
+    xlab = "",
+    ylab = "SEX"
+  )
+boxplot_column7 <-
+  qplot(
+    x = impvar_data$WAGP,
+    y = impvar_data[, 7],
+    geom = "boxplot" ,
+    xlab = "",
+    ylab = "MSP"
+  )
+boxplot_column8 <-
+  qplot(
+    x = impvar_data$WAGP,
+    y = impvar_data[, 8],
+    geom = "boxplot" ,
+    xlab = "",
+    ylab = "CIT"
+  )
+boxplot_column9 <-
+  qplot(
+    x = impvar_data$WAGP,
+    y = impvar_data[, 9],
+    geom = "boxplot" ,
+    xlab = "",
+    ylab = "RAC1P"
+  )
+
+grid.arrange(
+  boxplot_column1,
+  boxplot_column2,
+  boxplot_column3,
+  boxplot_column4,
+  boxplot_column5,
+  boxplot_column6,
+  boxplot_column7,
+  boxplot_column8,
+  boxplot_column9,
+  ncol = 9
+)
+
+
+
+
+
+#Train Test Split
+y <- impvar_data$WAGP
+x <-
+  impvar_data[, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)] #only first 16 columns (predictors)
+
+inTrain <- createDataPartition(y = y, p = .70, list = FALSE)
+Train.data <- impvar_data[inTrain, ]
+Test.data <- impvar_data[-inTrain, ]
+na.omit(Train.data)
+na.omit(Test.data)
+summary(Train.data)
+summary(Test.data)
+
+#CV
+ctrl <- trainControl(method = "cv", number = 5)
+
+
+#Regular Linear Regression
+lm.train <- train(
+  WAGP ~ .,
+  data = Train.data,
+  method = "lm",
+  tuneLength = 4,
+  preProcess = c("scale", "center"),
+  trControl = ctrl
+)
+summary(lm.train)
+lm.predict <- predict(lm.train, Test.data)
+RMSE(lm.predict, Test.data$WAGP)
+
+# Decision Trees
+
+dc.train <- train(
+  WAGP ~ .,
+  data = Train.data,
+  method = "rpart",
+  tuneLength = 4,
+  preProcess = c("scale", "center"),
+  trControl = ctrl
+)
+dc.train
+dc.rpart <- rpart(WAGP ~ ., data = Train.data)
+
+#very readable defaults
+rpart.plot(dc.rpart)
+opt.cp <-
+  dc.rpart$cptable[which.min(dc.rpart$cptable[, "xerror"]), "CP"]
 
 #lets prune the tree
-fit.pruned <- prune(fit, cp=opt.cp)
-
-
-summary(fit.pruned)
-
-
-#lets review the final tree
-rpart.plot(fit.pruned)
-
-p.rpart <- predict(fit.pruned,Test.data)
-
-score <- p.rpart[, c("Yes")]
-actual_class <- Test.data$Player_1_Wins == "Yes"
-pred <- prediction(score, actual_class)  #creates a prediction object which is passed on to performance object
-perf <- performance(pred, "tpr", "fpr")
-
-plot(perf, lwd=2, xlab="False Positive Rate (FPR)",
-     ylab="True Positive Rate (TPR)")
-abline(a=0, b=1, col="gray50", lty=3)
-
-## corresponding AUC score
-auc <- performance(pred, "auc")
-auc <- unlist(slot(auc, "y.values"))
-auc
-
-
-
-##################################NAIVE BAYES#######################3
-
-library(e1071)
-
-nb_model <- naiveBayes(Player_1_Wins ~ country + day + tournament_name + doubles + player_1_name + player_2_name + player_1_score + player_2_score + retired_player + cancelled_game + walkover + Player_1_odd + Player_2_odd, 
-                       Train.data)
-
-# display model
-nb_model
-
-
-# predict with testdata
-results <- predict (nb_model,Test.data[,-10], type='raw')
-
-# display results
-results
-
-score <- results[, c("Yes")]
-actual_class <- Test.data$Player_1_Wins == "Yes"
-pred <- prediction(score, actual_class)  #creates a prediction object which is passed on to performance object
-perf <- performance(pred, "tpr", "fpr")
-
-plot(perf, lwd=2, xlab="False Positive Rate (FPR)",
-     ylab="True Positive Rate (TPR)")
-abline(a=0, b=1, col="gray50", lty=3)
-
-## corresponding AUC score
-auc <- performance(pred, "auc")
-auc <- unlist(slot(auc, "y.values"))
-auc
-
-
-
-
-#########################Laplace smoothing######################################################
-
-nb_model1 = naiveBayes(Player_1_Wins ~ country + day + tournament_name + doubles + player_1_name + player_2_name + player_1_score + player_2_score + retired_player + cancelled_game + walkover + Player_1_odd + Player_2_odd, 
-                       Train.data, laplace=1) 
-nb_model1
-
-results1 <- predict (nb_model1,Test.data,type = 'raw')
-results1
-
-score <- results1[, c("Yes")]
-actual_class <- Test.data$Player_1_Wins == "Yes"
-pred <- prediction(score, actual_class)  #creates a prediction object which is passed on to performance object
-perf <- performance(pred, "tpr", "fpr")
-
-plot(perf, lwd=2, xlab="False Positive Rate (FPR)",
-     ylab="True Positive Rate (TPR)")
-abline(a=0, b=1, col="gray50", lty=3)
-
-## corresponding AUC score
-auc <- performance(pred, "auc")
-auc <- unlist(slot(auc, "y.values"))
-auc
-
-
-
-
-
-#############--------NEAURAL NETWORK----------------
-
-modelLookup("nnet")
-
-m.nnet <- train(Player_1_Wins ~   doubles + player_1_name   +    player_2_name  + player_1_score + player_2_score + retired_player + cancelled_game + walkover + awarded_player + Player_1_odd + Player_2_odd, 
-                trControl = ctrl2,
-                metric = "Accuracy", #using AUC to find best performing parameters
-                preProc = c("range", "nzv"), #scale from 0 to 1 and from columns with zero variance
-                data = Train.data, 
-                method = "nnet")
-
-m.nnet
-plot(m.nnet)
-p.nnet <- predict(m.nnet,dummy.test)
-confusionMatrix(p.nnet,dummy.test$country_destination)
-
-###############-----------------BAGGING ------------------
-#some meta-learning examples
-##BAGGING - bootstrapping is used to create many training sets and simple models are trained on each and combined
-##many small decision trees
-#install.packages("ipred")
-library(ipred)
-
-m.bag <- train(Player_1_Wins ~   doubles + player_1_name   +    player_2_name  + player_1_score + player_2_score + retired_player + cancelled_game + walkover + awarded_player + Player_1_odd + Player_2_odd, 
-               trControl = ctrl,
-               metric = "Accuracy", #using AUC to find best performing parameters
-               preProc = c("range", "nzv"), #scale from 0 to 1 and from columns with zero variance
-               data = Train.data, 
-               method = "treebag")
-m.bag
-p.bag<- predict(m.bag,Test.data)
-p.bag
-confusionMatrix(p.bag,Test.data$Player_1_Wins)
-
-
-pred <- prediction(as.numeric(p.bag), Test.data$Player_1_Wins)
-perf <- performance(pred,"tpr","fpr")
-performance(pred,"auc")@y.values
-confusionMatrix(p.rf, Test.data$Player_1_Wins)
-
-plot(perf, lwd=2, xlab="False Positive Rate (FPR)",
-     ylab="True Positive Rate (TPR)")
-abline(a=0, b=1, col="gray50", lty=3)
-
-
-## corresponding AUC score
-auc <- performance(pred, "auc")
-auc <- unlist(slot(auc, "y.values"))
-auc
-
-###########----------------RANDOM FOREST-------------------------
-#random forest approach to many classification models created and voted on
-#less prone to ovrefitting and used on large datasets
-library(randomForest)
-set.seed(10)
-
-RF<- randomForest(Player_1_Wins ~   doubles  + player_1_score + player_2_score + retired_player + cancelled_game + walkover + awarded_player + Player_1_odd + Player_2_odd, 
-                  data=Train.data, importance=TRUE, proximity=FALSE, 
-                  ntree=10000, keep.forest=TRUE)
-
-p.rf<- predict(RF,Test.data)
-p.rf
-
-print(p.rf)
-
-pred <- prediction(as.numeric(p.rf), Test.data$Player_1_Wins)
-perf <- performance(pred,"tpr","fpr")
-performance(pred,"auc")@y.values
-confusionMatrix(p.rf, Test.data$Player_1_Wins)
-
-plot(perf, lwd=2, xlab="False Positive Rate (FPR)",
-     ylab="True Positive Rate (TPR)")
-abline(a=0, b=1, col="gray50", lty=3)
-
-
-## corresponding AUC score
-auc <- performance(pred, "auc")
-auc <- unlist(slot(auc, "y.values"))
-auc
-
-########### with CARET RANDOM FOREST##############
-m.rf <- train(Player_1_Wins ~   doubles + player_1_name   +    player_2_name  + player_1_score + player_2_score + retired_player + cancelled_game + walkover + awarded_player + Player_1_odd + Player_2_odd, 
-              trControl = ctrl,
-              metric = "Accuracy", #using AUC to find best performing parameters
-              preProc = c("range", "nzv"), #scale from 0 to 1 and from columns with zero variance
-              data = Train.data, 
-              method = c("rf") )
-m.rf
-p.rf<- predict(m.rf,Test.data)
-confusionMatrix(p.rf,Test.data$Player_1_Wins)
-
-pred <- prediction(as.numeric(p.rf), Test.data$Player_1_Wins)
-perf <- performance(pred,"tpr","fpr")
-performance(pred,"auc")@y.values
-confusionMatrix(p.rf, Test.data$Player_1_Wins)
-
-plot(perf, lwd=2, xlab="False Positive Rate (FPR)",
-     ylab="True Positive Rate (TPR)")
-abline(a=0, b=1, col="gray50", lty=3)
-
-
-## corresponding AUC score
-auc <- performance(pred, "auc")
-auc <- unlist(slot(auc, "y.values"))
-auc
-
-
-#######################################------SVM-----##########################
-
-library(kernlab)
-
-set.seed(200)
-
-
-svm_classifier <- ksvm(Player_1_Wins ~   doubles + player_1_name   +    player_2_name  + player_1_score + player_2_score + retired_player + cancelled_game + walkover + awarded_player + Player_1_odd + Player_2_odd,  
-                       data = Train.data,
-                       kernel = "vanilladot", scaled=TRUE)
-
-svm_classifier
-
-##  Evaluating model performance ----
-# predictions on testing dataset
-p_svm_classifier <- predict(svm_classifier, Test.data)
-head(p_svm_classifier)
-
-table(p_svm_classifier, Test.data$Player_1_Wins)
-
-#use caret confusion matrix
-confusionMatrix(p_svm_classifier,Test.data$Player_1_Wins) #72.44% AVG Accuracy
-
-pred <- prediction(as.numeric(p_svm_classifier), Test.data$Player_1_Wins)
-perf <- performance(pred,"tpr","fpr")
-performance(pred,"auc")@y.values
-confusionMatrix(p_svm_classifier, Test.data$Player_1_Wins)
-
-plot(perf, lwd=2, xlab="False Positive Rate (FPR)",
-     ylab="True Positive Rate (TPR)")
-abline(a=0, b=1, col="gray50", lty=3)
-
-
-## corresponding AUC score
-auc <- performance(pred, "auc")
-auc <- unlist(slot(auc, "y.values"))
-auc
-
-
+dc.rpart.pruned <- prune(dc.rpart, cp = opt.cp)
+rpart.plot(dc.rpart.pruned)
+yhat.dc.rpart <- predict(dc.rpart.pruned, Test.data)
+RMSE(yhat.dc.rpart, Test.data$WAGP)
+
+#smooth spline regression
+#gamSpline in caret will expand each predictor with smooth spline searching for df value
+gam.train <- train(
+  WAGP ~ .,
+  data = Train.data,
+  method = "gamSpline",
+  tuneLength = 4,
+  preProcess = c("scale", "center"),
+  trControl = ctrl
+)
+gam.train
+
+gam.predict <- predict(gam.train, Test.data)
+
+RMSE(gam.predict, Test.data$WAGP)
+
+#Lasso
+lasso.train <- train(
+  WAGP ~ .,
+  data = Train.data,
+  method = "lasso",
+  tuneLength = 4,
+  preProcess = c("scale", "center"),
+  trControl = ctrl
+)
+lasso.train
+lasso.predict <- predict(lasso.train, Test.data)
+
+RMSE(lasso.predict, Test.data$WAGP)
+
+#RF
+rf.train <- train(
+  WAGP ~ .,
+  data = Train.data,
+  method = "rf",
+  tuneLength = 4,
+  preProcess = c("scale", "center"),
+  trControl = ctrl
+)
+plot(rf.train)
+rf.predict <- predict(rf.train, Test.data)
+RMSE(rf.predict, Test.data$WAGP)
+
+
+#bagging tree
+bag.train <-
+  train(
+    WAGP ~ .,
+    data = Train.data,
+    preProcess = c("scale", "center"),
+    method = "treebag",
+    tuneLength = 4,
+    trControl = ctrl
+  )
+
+
+bag.train
+plot(bag.train)
+bag.predict <- predict(bag.train, Test.data)
+
+RMSE(bag.predict, Test.data$WAGP)
+
+
+#boosting
+boost.train <- train(
+  WAGP ~ .,
+  data = Train.data,
+  method = "gbm",
+  tuneLength = 4,
+  trControl = ctrl
+)
+boost.train
+plot(boost.train)
+
+boost.predict <- predict(boost.train, Test.data)
+
+RMSE(boost.predict, Test.data$WAGP)
+
+
+
+
+models_train <- list(
+  "lm" = lm.train,
+  "gam" = gam.train,
+  "lasso" = lasso.train,
+  "DT" = dc.train,
+  "BaggingTree" = bag.train,
+  "RF" = rf.train,
+  "BoostingTree" = boost.train
+)
+
+
+data.resamples1 <- resamples(models_train)
+
+summary(data.resamples1)
+
+### VISUALIZING TRAIN PERFORMANCE ###
+bwplot(data.resamples1, metric = "RMSE")
+bwplot(data.resamples1, metric = "Rsquared")
+
+### Resamples for Test Error(RMSE) and Rsquared ###
+postResample(pred = lm.predict, obs = Test.data$WAGP)
+postResample(pred = yhat.dc.rpart, obs = Test.data$WAGP)
+postResample(pred = gam.predict, obs = Test.data$WAGP)
+postResample(pred = bag.predict, obs = Test.data$WAGP)
+postResample(pred = lasso.predict, obs = Test.data$WAGP)
+postResample(pred = bag.predict, obs = Test.data$WAGP)
+postResample(pred = boost.predict, obs = Test.data$WAGP)
+postResample(pred = rf.predict, obs = Test.data$WAGP)
