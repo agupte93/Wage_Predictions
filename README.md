@@ -1,18 +1,8 @@
-# Predicting Annual Wages of Individuals Based on Public Use Microdata Samples
-Use PUMS Data from Census.gov to Predict Wages for individuals
-![](./myMediaFolder/media/image1.png){width="2.803274278215223in"
-height="1.9479166666666667in"}
+#Predicting Annual Wages of Individuals Based on Public Use Microdata Samples
 
-**Team: Mean Squares**
+![](./myMediaFolder/media/image1.png =150x150)
 
-Mayuri Kudale
-
-Amit Gupte
-
-Kanchan Pathak
-
-Monish Thakore
-
+Table of Contents
 
 [Part 1 Executive Summary 3](#_Toc450490166)
 
@@ -32,6 +22,8 @@ Monish Thakore
 
 [Appendix: R Code 22](#_Toc450490196)
 
+Part 8
+Prospects...................................................................................................................................................
 
 **Executive Summary**
 
@@ -302,15 +294,16 @@ R squared (R\^2) values to assess and measure performances and accuracy
 of models. They are shown below in Figure 5, Figure 5.1. Boosting
 provided the most accurate results.
 
-  **Data Modeling Techniques**   **Tuning Parameter**   **R\^2**   **Error (Train)**   **Error (Test)**
-  ------------------------------ ---------------------- ---------- ------------------- ------------------
-  Linear Regression                                     26         RMSE =35000         RMSE =35670
-  Lasso Regression                                      25.6       RMSE =38000         RMSE =39090
-  Random Forest                                         43         RMSE =32000         RMSE =32091
-  Decision Tree                                         18         RMSE =31300         RMSE =33102
-  GAM                                                   32         RMSE =35000         RMSE =36070
-  Bagging                                               29         RMSE =32700         RMSE =32905
-  Boosting                                              42         RMSE=29000          RMSE=29311
+  
+| **Data Modeling Techniques** | **Tuning Parameter** | **R^2** | **Error (Train)** | **Error (Test)** |
+| --- | --- | --- | --- | --- |
+| Linear Regression |   | 26 | RMSE =35000 | RMSE =35670 |
+| Lasso Regression |   | 25.6 | RMSE =38000 | RMSE =39090 |
+| Random Forest |   | 43 | RMSE =32000 | RMSE =32091 |
+| Decision Tree |   | 18 | RMSE =31300 | RMSE =33102 |
+| GAM |   | 32 | RMSE =35000 | RMSE =36070 |
+| Bagging |   | 29 | RMSE =32700 | RMSE =32905 |
+| Boosting |   | 42 | RMSE=29000 | RMSE=29311 |
 
 However, the difference between Train and Test error was huge. As per
 the Professors' suggestion we ran our modes on a range of data were the
@@ -321,15 +314,15 @@ After re-running the models on the modified split of the dataset we were
 able to achieve a better R-square and lower RMSE. And the modified Root
 Mean Square Error (RMSE) and R squared (R\^2) are as below:
 
-  **Data Modeling Techniques**   **Tuning Parameter**   **R\^2**   **Error (Train)**   **Error (Test)**
-  ------------------------------ ---------------------- ---------- ------------------- ------------------
-  Linear Regression                                     23         RMSE =33100         RMSE =32850
-  Lasso Regression                                      23         RMSE =33000         RMSE =32885
-  Random Forest                                         42         RMSE =29000         RMSE =29697
-  Decision Tree                                         22         RMSE =33300         RMSE =33102
-  GAM                                                   32         RMSE =31200         RMSE =31218
-  Bagging                                               24         RMSE =32790         RMSE =32707
-  Boosting                                              43         RMSE=28700          RMSE=28839
+  | **Data Modeling Techniques** | **Tuning Parameter** | **R^2** | **Error (Train)** | **Error (Test)** |
+| --- | --- | --- | --- | --- |
+| Linear Regression |   | 23 | RMSE =33100 | RMSE =32850 |
+| Lasso Regression |   | 23 | RMSE =33000 | RMSE =32885 |
+| Random Forest |   | 42 | RMSE =29000 | RMSE =29697 |
+| Decision Tree |   | 22 | RMSE =33300 | RMSE =33102 |
+| GAM |   | 32 | RMSE =31200 | RMSE =31218 |
+| Bagging |   | 24 | RMSE =32790 | RMSE =32707 |
+| Boosting |   | 43 | RMSE=28700 | RMSE=28839 |
 
 The best model that fit the data was Boosting with an R-square of 43 and
 a test RMSE of \$28839. Figure 5 shows the results of boosting with
