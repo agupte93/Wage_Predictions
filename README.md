@@ -1,20 +1,7 @@
-# Wage_Predictions
+# Predicting Annual Wages of Individuals Based on Public Use Microdata Samples
 Use PUMS Data from Census.gov to Predict Wages for individuals
-![](media/image1.png){width="2.803274278215223in"
+![](./myMediaFolder/media/image1.png){width="2.803274278215223in"
 height="1.9479166666666667in"}
-
-**Predicting Annual Wages of Individuals Based on Public Use Microdata
-Samples:**
-
-**A Big Data Analytics Approach**
-
-**MIS 749: Business Analytics**
-
-**Project Report**
-
-**San Diego State University**
-
-**May 2, 2018**
 
 **Team: Mean Squares**
 
@@ -26,7 +13,6 @@ Kanchan Pathak
 
 Monish Thakore
 
-Table of Contents
 
 [Part 1 Executive Summary 3](#_Toc450490166)
 
@@ -130,7 +116,7 @@ age, gender, Industry etc. Distribution of variables can be explained
 visually in the figure 1.0.
 
 ![A screenshot of a cell phone Description generated with very high
-confidence](media/image2.png){width="5.952180664916885in"
+confidence](./myMediaFolder/media/image2.png){width="5.952180664916885in"
 height="3.3481014873140857in"}
 
 *Figure 1.0: Distribution of all Variables*
@@ -177,7 +163,7 @@ values/outliers. As shown in figure 1.1, this boxplot helped us identify
 the outliers:
 
 ![A close up of a door Description generated with high
-confidence](media/image3.png){width="5.550633202099737in"
+confidence](./myMediaFolder/media/image3.png){width="5.550633202099737in"
 height="3.122823709536308in"}
 
 *Figure 1.1: Outliers*
@@ -226,7 +212,8 @@ As a part of data preparation process, the activities consisted of:
 For the data preparation steps, tools which were implemented include R,
 Tableau, SQL, and Microsoft Excel.
 
-![](media/image4.JPG){width="4.395833333333333in" height="3.53125in"}
+![](./myMediaFolder/media/image4.JPG){width="4.395833333333333in"
+height="3.53125in"}
 
 *Figure 2.0: Correlation Plot*
 
@@ -241,7 +228,7 @@ We started our modelling phase with a simple Decision Tree
 implementation to get a fair idea about the important predictors.
 
 ![A close up of a device Description generated with high
-confidence](media/image5.png){width="4.133916229221347in"
+confidence](./myMediaFolder/media/image5.png){width="4.133916229221347in"
 height="2.8003958880139983in"}
 
 *Figure 3.0: Decision Tree*
@@ -283,7 +270,7 @@ based on Principal Component Analysis because after pre-processing only
 10 important predictors were left to run models.
 
 ![A close up of a map Description generated with very high
-confidence](media/image6.png){width="5.802083333333333in"
+confidence](./myMediaFolder/media/image6.png){width="5.802083333333333in"
 height="2.911111111111111in"}
 
 *Figure 4.0: Variable Importance*
@@ -349,18 +336,19 @@ a test RMSE of \$28839. Figure 5 shows the results of boosting with
 different depths.
 
 ![A close up of a map Description generated with high
-confidence](media/image7.png){width="5.46805227471566in"
+confidence](./myMediaFolder/media/image7.png){width="5.46805227471566in"
 height="3.7151891951006126in"}
 
 *Figure 5: Boosting Performance vs Iterations*
 
 ![A screenshot of a cell phone Description generated with very high
-confidence](media/image8.png){width="5.204037620297463in"
+confidence](./myMediaFolder/media/image8.png){width="5.204037620297463in"
 height="3.525317147856518in"}
 
 *Figure 5.1: Train RMSE for all models*
 
-![](media/image9.png){width="5.166666666666667in" height="3.5in"}
+![](./myMediaFolder/media/image9.png){width="5.166666666666667in"
+height="3.5in"}
 
 *Figure 5.2: Train R squares for all models*
 
