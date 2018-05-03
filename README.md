@@ -1,9 +1,5 @@
 # Predicting Annual Wages of Individuals Based on Public Use Microdata Samples
 
-![A screenshot of a cell phone Description generated with very high
-confidence](./myMediaFolder/media/image1.png){width=150px}
-
-Table of Contents 
 
 [Part 1 Executive Summary 3](#_Toc450490166)
 
@@ -22,9 +18,6 @@ Table of Contents
 [References 22](#_Toc450490195)
 
 [Appendix: R Code 22](#_Toc450490196)
-
-Part 8
-Prospects...................................................................................................................................................
 
 **Executive Summary**
 
