@@ -63,11 +63,11 @@ applications.
     number of test set observations. The dataset observations were split
     between training and test set, 70% and 30% respectively.
 
-  **Dataset**                                   
-  --------------------------------------------- ---------
-  Number of observations in total dataset:      112,810
-  Number of observations in training dataset:   78967
-  Number of observations in test dataset:       33843
+|**Dataset**|| 
+| --- | --- |
+| Number of observations in total dataset: | 112,810 |
+| Number of observations in training dataset: | 78967 |
+| Number of observations in test dataset: | 33843 |
 
 -   R was used to implementing 7 various model building techniques:
 
