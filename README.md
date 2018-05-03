@@ -1,7 +1,7 @@
 # Predicting Annual Wages of Individuals Based on Public Use Microdata Samples
 
 ![A screenshot of a cell phone Description generated with very high
-confidence](./myMediaFolder/media/image1.png=150x150)
+confidence](./myMediaFolder/media/image1.png){width=150px}
 
 Table of Contents 
 
