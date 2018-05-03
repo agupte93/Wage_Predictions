@@ -1,24 +1,6 @@
 # Predicting Annual Wages of Individuals Based on Public Use Microdata Samples
 
 
-[Part 1 Executive Summary 3](#_Toc450490166)
-
-[Part 2 Discovery 4](#_Toc450490167)
-
-[Part 3 Data Preparation 6](#_Toc450490174)
-
-[Part 4 Model Planning 12](#_Toc450490181)
-
-[Part 5 Model Building 12](#_Toc450490182)
-
-[Part 6 Results and Performance 16](#_Toc450490189)
-
-[Part 7 Discussions and Recommendations 20](#_Toc450490194)
-
-[References 22](#_Toc450490195)
-
-[Appendix: R Code 22](#_Toc450490196)
-
 **Executive Summary**
 
 Salary estimator tool plays a significant role in today's world, it
@@ -102,8 +84,7 @@ age, gender, Industry etc. Distribution of variables can be explained
 visually in the figure 1.0.
 
 ![A screenshot of a cell phone Description generated with very high
-confidence](./myMediaFolder/media/image2.png){width="5.952180664916885in"
-height="3.3481014873140857in"}
+confidence](./myMediaFolder/media/image2.png)
 
 *Figure 1.0: Distribution of all Variables*
 
@@ -214,8 +195,7 @@ We started our modelling phase with a simple Decision Tree
 implementation to get a fair idea about the important predictors.
 
 ![A close up of a device Description generated with high
-confidence](./myMediaFolder/media/image5.png){width="4.133916229221347in"
-height="2.8003958880139983in"}
+confidence](./myMediaFolder/media/image5.png)
 
 *Figure 3.0: Decision Tree*
 
@@ -256,8 +236,7 @@ based on Principal Component Analysis because after pre-processing only
 10 important predictors were left to run models.
 
 ![A close up of a map Description generated with very high
-confidence](./myMediaFolder/media/image6.png){width="5.802083333333333in"
-height="2.911111111111111in"}
+confidence](./myMediaFolder/media/image6.png)
 
 *Figure 4.0: Variable Importance*
 
@@ -323,8 +302,7 @@ a test RMSE of \$28839. Figure 5 shows the results of boosting with
 different depths.
 
 ![A close up of a map Description generated with high
-confidence](./myMediaFolder/media/image7.png){width="5.46805227471566in"
-height="3.7151891951006126in"}
+confidence](./myMediaFolder/media/image7.png)
 
 *Figure 5: Boosting Performance vs Iterations*
 
