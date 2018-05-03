@@ -130,8 +130,7 @@ values/outliers. As shown in figure 1.1, this boxplot helped us identify
 the outliers:
 
 ![A close up of a door Description generated with high
-confidence](./myMediaFolder/media/image3.png){width="5.550633202099737in"
-height="3.122823709536308in"}
+confidence](./myMediaFolder/media/image3.png)
 
 *Figure 1.1: Outliers*
 
@@ -179,8 +178,7 @@ As a part of data preparation process, the activities consisted of:
 For the data preparation steps, tools which were implemented include R,
 Tableau, SQL, and Microsoft Excel.
 
-![](./myMediaFolder/media/image4.JPG){width="4.395833333333333in"
-height="3.53125in"}
+![](./myMediaFolder/media/image4.JPG)
 
 *Figure 2.0: Correlation Plot*
 
@@ -307,13 +305,11 @@ confidence](./myMediaFolder/media/image7.png)
 *Figure 5: Boosting Performance vs Iterations*
 
 ![A screenshot of a cell phone Description generated with very high
-confidence](./myMediaFolder/media/image8.png){width="5.204037620297463in"
-height="3.525317147856518in"}
+confidence](./myMediaFolder/media/image8.png)
 
 *Figure 5.1: Train RMSE for all models*
 
-![](./myMediaFolder/media/image9.png){width="5.166666666666667in"
-height="3.5in"}
+![](./myMediaFolder/media/image9.png)
 
 *Figure 5.2: Train R squares for all models*
 
